@@ -1,16 +1,16 @@
 import React, { useEffect, useState } from "react";
 import "./style.css"
-import Navbar from "./components/Navbar";
 import {Routes,Link,Outlet,Route } from "react-router-dom";
 import Login from "./components/login";
 import Reporter from "./components/Reporter/Reporter";
 import Dashboard from "./components/Reporter/Dashboard";
 import ReportIssue from "./components/Reporter/ReportIssue";
 import MyIssues from "./components/Reporter/MyIssues";
-import Profile from "./components/Reporter/Profile"
+import Profile from "./components/Reporter/Profile";
+import Maintainer from "./components/Maintainer/Maintainer"
+import Mdashboard from "./components/Maintainer/Mdashboard";
+import AssignedIssues from "./components/Maintainer/AssignedIssues";
 export default function App() {
-  const role = "maintainer"; // dynamically fetch from auth or context
-
   return (
     <>
     {/* <Navbar/> */}
@@ -23,6 +23,13 @@ export default function App() {
         <Route path="dashboard" element={<Dashboard />} />
         <Route path="report" element={<ReportIssue />} />
         <Route path="myissues" element={<MyIssues />} />
+        <Route path="profile" element={<Profile />} />
+      </Route>
+        {/* Nested routes for Maintainer */}
+      <Route path="maintainer" element={<Maintainer />}>
+        <Route index element={<Mdashboard />} /> {/* Default route */}
+        <Route path="dashboard" element={<Mdashboard />} />
+        <Route path="assigned-issues" element={<AssignedIssues/>}/>
         <Route path="profile" element={<Profile />} />
       </Route>
       <Route path="logout" element={<Login />} />

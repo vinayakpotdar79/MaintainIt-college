@@ -39,7 +39,7 @@ const ReporterDashboard = () => {
   return (
     <>
       <div className="min-h-screen bg-gradient-to-br from-violet-100 to-indigo-100 p-8">
-        <h2 className="text-3xl font-bold text-violet-800 mb-8 text-center">
+        <h2 className="text-2xl sm:text-3xl font-bold text-violet-800 mb-8 text-center">
           🧾 Reporter Dashboard
         </h2>
 

@@ -34,7 +34,7 @@ const Login = () => {
       });
 
       console.log("Logged in:", res.data);
-      navigate("/reporter");
+      navigate(`/${role}`);
     } catch (err) {
       console.log(err)
       console.error("Login failed:", err);

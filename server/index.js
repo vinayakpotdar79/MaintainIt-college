@@ -83,6 +83,7 @@ app.post("/login", (req, res, next) => {
   const roleFromClient = req.body.role;
 
   passport.authenticate("local", (err, user, info) => {
+    console.log(info)
     if (err) return next(err);
 
     if (!user) {
@@ -100,6 +101,12 @@ app.post("/login", (req, res, next) => {
     });
   })(req, res, next);
 });
+
+//Is authenticated middlware
+ function isAuthenticated(req, res, next) {
+  if (req.isAuthenticated()) return next();
+  res.status(401).json({ message: "Unauthorized" });
+}
 
 app.get("/reporter", (req, res) => {
   if (req.isAuthenticated()) {
@@ -145,6 +152,7 @@ app.get("/myissues",async(req,res)=>{
 
 app.get("/dashboard",async(req,res)=>{
   let user_id=req.user.id
+  let user_role=req.user.role
  try{
   let result= await db.query("SELECT id,floor, room, device, description, priority, status, created_at FROM issues WHERE user_id = $1 ORDER BY created_at DESC"
     ,[user_id])
@@ -160,13 +168,72 @@ app.get("/dashboard",async(req,res)=>{
 
 })
 
-// Route to fetch user profile
-app.get("/profile", async (req, res) => {
-  const userId = req.user.id
-  if (!userId) {
-    return res.status(401).json({ message: "Unauthorized" });
+app.get("/maintainer", (req, res) => {
+  if (req.isAuthenticated()) {
+    res.json({ message: "Welcome to the maintainer route!"});
+  } else {
+    res.status(401).json({ message: "Unauthorized" });
   }
+});
 
+// Get all issues assigned to the logged-in maintainer
+app.get("/issues", async (req, res) => {
+  const maintainerId = req.user.id;
+
+  try {
+    const result = await db.query(
+      `SELECT id, floor, room, device, description, priority, status, created_at
+       FROM issues
+       ORDER BY created_at DESC`,
+
+    );
+    console.log(result.rows)
+    res.status(200).json({ success: true, issues: result.rows });
+  } catch (err) {
+    console.error("Error fetching issues:", err);
+    res.status(500).json({ message: "Internal server error" });
+  }
+});
+
+// Get all issues assigned to the currently logged-in maintainer
+app.get("/assigned-issues", async (req, res) => {
+  try {
+    const result = await db.query(
+      `SELECT id, floor, room, device, description, priority, status, created_at 
+       FROM issues 
+       ORDER BY created_at DESC`);
+    res.status(200).json({ issues: result.rows });
+  } catch (err) {
+    console.error("Error fetching assigned issues:", err);
+    res.status(500).json({ message: "Server error" });
+  }
+});
+
+// PATCH /issues/:id
+app.patch("/issues/:id", async (req, res) => {
+  const issueId = req.params.id;
+  const { status, remark } = req.body;
+  const maintainerId = req.user.id;
+
+   try {
+    await db.query(
+      `UPDATE issues 
+       SET status = $1, remark = $2 
+       WHERE id = $3`,
+      [status, remark, issueId]
+    );
+
+    res.status(200).json({ success: true, message: "Issue updated successfully" });
+  } catch (err) {
+    console.error("Error updating issue:", err);
+    res.status(500).json({ success: false, message: "Internal Server Error" });
+  }
+});
+
+
+// Route to fetch user profile
+app.get("/profile",isAuthenticated ,async (req, res) => {
+  const userId = req.user.id
   try {
     const result = await db.query(
       "SELECT username, email, phone, role, joined_at FROM users WHERE id = $1",

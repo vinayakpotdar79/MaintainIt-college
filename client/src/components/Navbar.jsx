@@ -14,7 +14,7 @@ export default function Navbar({role}) {
     ],
     maintainer: [
       { name: "Dashboard", path: "/maintainer/dashboard" },
-      { name: "Assigned Issues", path: "/maintainer/issues" },
+      { name: "Assigned Issues", path: "/maintainer/assigned-issues" },
     ],
     admin: [
       { name: "Dashboard", path: "/admin/dashboard" },
@@ -48,7 +48,7 @@ export default function Navbar({role}) {
               >
                 ☰
               </button>
-              <Link to="/reporter/dashboard" className="text-3xl font-bold text-blue-400">
+              <Link to={`/${role}/dashboard`} className="text-3xl font-bold text-blue-400">
              <div className="flex items-center space-x-3">
              <img src="https://cdn-icons-png.flaticon.com/128/18208/18208249.png" alt="Maintenance Icon"className="w-10 h-10"
                />
@@ -67,7 +67,7 @@ export default function Navbar({role}) {
                   {link.name}
                 </Link>
               ))}
-              <Link to="/reporter/profile"className="hover:text-blue-400 transition">
+              <Link to={`/${role}/profile`}  className="hover:text-blue-400 transition">
                 Profile
               </Link>
               <Link to="/logout" className="text-red-600 font-semibold">
