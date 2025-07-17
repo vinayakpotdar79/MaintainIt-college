@@ -10,6 +10,9 @@ import Profile from "./components/Reporter/Profile";
 import Maintainer from "./components/Maintainer/Maintainer"
 import Mdashboard from "./components/Maintainer/Mdashboard";
 import AssignedIssues from "./components/Maintainer/AssignedIssues";
+import Admin from "./components/Admin/Admin";
+import AdminDashboard from "./components/Admin/AdminDashboard";
+import Manageusers from "./components/Admin/Manageusers";
 export default function App() {
   return (
     <>
@@ -32,6 +35,13 @@ export default function App() {
         <Route path="assigned-issues" element={<AssignedIssues/>}/>
         <Route path="profile" element={<Profile />} />
       </Route>
+       <Route path="admin" element={<Admin />}>
+      <Route index element={<AdminDashboard />} />
+      <Route path="dashboard" element={<AdminDashboard />} />
+      {/* <Route path="issues" element={<AllIssues />} /> */}
+     <Route path="users" element={<Manageusers />} />
+      <Route path="profile" element={<Profile />} />
+</Route>
       <Route path="logout" element={<Login />} />
     </Routes>
     </>
