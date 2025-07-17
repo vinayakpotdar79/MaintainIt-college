@@ -18,7 +18,7 @@ export default function Navbar({role}) {
     ],
     admin: [
       { name: "Dashboard", path: "/admin/dashboard" },
-      { name: "All Issues", path: "/admin/issues" },
+      // { name: "All Issues", path: "/admin/issues" },
       { name: "Manage Users", path: "/admin/users" },
     ],
   };
