@@ -90,7 +90,7 @@ const ManageUsers = () => {
                   {editingUser?.id === user.id ? (
                     <input
                       value={editingUser.username}
-                      onChange={(e) => setEditingUser({ ...editingUser, name: e.target.value })}
+                      onChange={(e) => setEditingUser({ ...editingUser, username: e.target.value })}
                       className="p-1 border rounded w-full " 
                     />
                   ) : (

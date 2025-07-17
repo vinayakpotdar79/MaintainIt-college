@@ -1,11 +1,10 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
-
+import axios from "axios";
+import { useNavigate } from "react-router-dom";
 export default function Navbar({role}) {
   const [isOpen, setIsOpen] = useState(false);
-
-
-
+    const navigate = useNavigate();
   const navLinks = {
     reporter: [
       { name: "Dashboard", path: "/reporter/dashboard" },
