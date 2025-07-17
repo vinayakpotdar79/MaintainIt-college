@@ -26,3 +26,4 @@ ALTER TABLE users ADD CONSTRAINT unique_email UNIQUE(email);
 
 drop table issues
 drop table users
+ALTER TABLE issues ADD COLUMN remark TEXT;

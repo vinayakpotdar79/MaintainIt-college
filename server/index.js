@@ -5,7 +5,7 @@ import pg from "pg";
 import passport from "passport";
 import session from "express-session";
 import { Strategy } from "passport-local";
-import bcrypt from "bcrypt";
+import bcrypt, { hash } from "bcrypt";
 import dotenv from "dotenv";
 dotenv.config();
 
@@ -137,7 +137,8 @@ app.get("/myissues",async(req,res)=>{
   let user_id=req.user.id
  try{
   let result= await
- db.query("SELECT  floor, room, device, description, priority, status, created_at FROM issues WHERE user_id = $1 ORDER BY created_at DESC",[user_id])
+ db.query(`SELECT  floor, room, device, description, priority, status, 
+  created_at AT TIME ZONE 'UTC' AT TIME ZONE 'Asia/Kolkata' AS created_at FROM issues WHERE user_id = $1 ORDER BY created_at`,[user_id])
   console.log(result.rows)
   res.status(200).json({ 
     success: true,
@@ -154,7 +155,8 @@ app.get("/dashboard",async(req,res)=>{
   let user_id=req.user.id
   let user_role=req.user.role
  try{
-  let result= await db.query("SELECT id,floor, room, device, description, priority, status, created_at FROM issues WHERE user_id = $1 ORDER BY created_at DESC"
+  let result= await db.query(`SELECT id,floor, room, device, description, priority, status, 
+    created_at AT TIME ZONE 'UTC' AT TIME ZONE 'Asia/Kolkata' AS created_at FROM issues WHERE user_id = $1 ORDER BY created_at DESC `
     ,[user_id])
   console.log(result.rows)
   res.status(200).json({ 
@@ -178,11 +180,11 @@ app.get("/maintainer", (req, res) => {
 
 // Get all issues assigned to the logged-in maintainer
 app.get("/issues", async (req, res) => {
-  const maintainerId = req.user.id;
 
   try {
     const result = await db.query(
-      `SELECT id, floor, room, device, description, priority, status, created_at
+      `SELECT id, floor, room, device, description, priority, status,
+      created_at AT TIME ZONE 'UTC' AT TIME ZONE 'Asia/Kolkata' AS created_at 
        FROM issues
        ORDER BY created_at DESC`,
 
@@ -199,7 +201,8 @@ app.get("/issues", async (req, res) => {
 app.get("/assigned-issues", async (req, res) => {
   try {
     const result = await db.query(
-      `SELECT id, floor, room, device, description, priority, status, created_at 
+      `SELECT id, floor, room, device, description, priority, status, 
+      created_at AT TIME ZONE 'UTC' AT TIME ZONE 'Asia/Kolkata' AS created_at 
        FROM issues 
        ORDER BY created_at DESC`);
     res.status(200).json({ issues: result.rows });
@@ -213,7 +216,6 @@ app.get("/assigned-issues", async (req, res) => {
 app.patch("/issues/:id", async (req, res) => {
   const issueId = req.params.id;
   const { status, remark } = req.body;
-  const maintainerId = req.user.id;
 
    try {
     await db.query(
@@ -230,13 +232,86 @@ app.patch("/issues/:id", async (req, res) => {
   }
 });
 
+app.get("/admin", (req, res) => {
+  if (req.isAuthenticated()) {
+    res.json({ message: "Welcome to the admin route!"});
+  } else {
+    res.status(401).json({ message: "Unauthorized" });
+  }
+});
+
+// routes/admin.js
+app.get("/stats", async (req, res) => {
+  try {
+    const totalUsers = await db.query("SELECT COUNT(*) FROM users");
+    const totalIssues = await db.query("SELECT COUNT(*) FROM issues");
+    const pending = await db.query("SELECT COUNT(*) FROM issues WHERE status = 'pending'");
+    const resolved = await db.query("SELECT COUNT(*) FROM issues WHERE status = 'resolved'");
+
+    res.json({
+      totalUsers: parseInt(totalUsers.rows[0].count),
+      totalIssues: parseInt(totalIssues.rows[0].count),
+      pendingIssues: parseInt(pending.rows[0].count),
+      resolvedIssues: parseInt(resolved.rows[0].count)
+    });
+  } catch (err) {
+    res.status(500).json({ error: "Error getting stats" });
+  }
+});
+
+
+// routes/users.js
+app.get("/users", async (req, res) => {
+  try {
+    const result = await db.query("SELECT * FROM users");
+    res.json({ users: result.rows });
+  } catch (err) {
+    res.status(500).json({ error: "Failed to fetch users" });
+  }
+});
+app.patch("/users/:id", async (req, res) => {
+  const { username, email, role } = req.body;
+  try {
+    await db.query(
+      "UPDATE users SET username = $1, email = $2, role = $3 WHERE id = $4",
+      [username, email, role, req.params.id]
+    );
+    res.json({ message: "User updated" });
+  } catch (err) {
+    res.status(500).json({ error: "Failed to update user" });
+  }
+});
+app.post("/users", async (req, res) => {
+  const { username, email, password,phone ,role } = req.body;
+      const hash=  await bcrypt.hash(password,saltRounds)
+  try {
+    await db.query(
+      "INSERT INTO users (username, email, password, phone,role) VALUES ($1, $2, $3, $4,$5)",
+      [username, email,hash, phone,role]
+    );
+    res.json({ message: "User created" });
+  } catch (err) {
+    res.status(500).json({ error: "Failed to add user" });
+  }
+});
+app.delete("/users/:id", async (req, res) => {
+  try {
+    await db.query("DELETE FROM users WHERE id = $1", [req.params.id]);
+    res.json({ message: "User deleted" });
+  } catch (err) {
+    res.status(500).json({ error: "Failed to delete user" });
+  }
+});
+
+
 
 // Route to fetch user profile
 app.get("/profile",isAuthenticated ,async (req, res) => {
   const userId = req.user.id
   try {
     const result = await db.query(
-      "SELECT username, email, phone, role, joined_at FROM users WHERE id = $1",
+      `SELECT username, email, phone, role,
+       joined_at AT TIME ZONE 'UTC' AT TIME ZONE 'Asia/Kolkata' AS joined_at FROM users WHERE id = $1`,
       [userId]
     );
     const user = result.rows[0];
