@@ -107,8 +107,20 @@ app.post("/login", (req, res, next) => {
   if (req.isAuthenticated()) return next();
   res.status(401).json({ message: "Unauthorized" });
 }
+// Is Role valid middleware
+function requireRole(role) {
+  return (req, res, next) => {
+    if (!req.isAuthenticated()) {
+      return res.status(401).json({ message: "Unauthorized" });
+    }
+    if (req.user.role !== role) {
+      return res.status(403).json({ message: "Forbidden - Insufficient permissions" });
+    }
+    next();
+  };
+}
 
-app.get("/reporter", (req, res) => {
+app.get("/reporter",requireRole("reporter") ,(req, res) => {
   if (req.isAuthenticated()) {
     res.json({ message: "Welcome to the reporter route!" });
   } else {
@@ -170,7 +182,7 @@ app.get("/dashboard",async(req,res)=>{
 
 })
 
-app.get("/maintainer", (req, res) => {
+app.get("/maintainer",requireRole("maintainer") ,(req, res) => {
   if (req.isAuthenticated()) {
     res.json({ message: "Welcome to the maintainer route!"});
   } else {
@@ -180,16 +192,26 @@ app.get("/maintainer", (req, res) => {
 
 // Get all issues assigned to the logged-in maintainer
 app.get("/issues", async (req, res) => {
-
+    
   try {
-    const result = await db.query(
-      `SELECT id, floor, room, device, description, priority, status,
-      created_at AT TIME ZONE 'UTC' AT TIME ZONE 'Asia/Kolkata' AS created_at 
+        const result = await db.query(
+      `SELECT 
+         issues.id,
+         issues.user_id,
+         users.role,
+         users.username,
+         issues.floor,
+         issues.room,
+         issues.device,
+         issues.description,
+         issues.priority,
+         issues.status,
+         issues.remark,
+         issues.created_at AT TIME ZONE 'UTC' AT TIME ZONE 'Asia/Kolkata' AS created_at
        FROM issues
-       ORDER BY created_at DESC`,
-
+       JOIN users ON issues.user_id = users.id
+       ORDER BY issues.created_at DESC`
     );
-    console.log(result.rows)
     res.status(200).json({ success: true, issues: result.rows });
   } catch (err) {
     console.error("Error fetching issues:", err);
@@ -232,14 +254,13 @@ app.patch("/issues/:id", async (req, res) => {
   }
 });
 
-app.get("/admin", (req, res) => {
+app.get("/admin",requireRole("admin") ,(req, res) => {
   if (req.isAuthenticated()) {
     res.json({ message: "Welcome to the admin route!"});
   } else {
     res.status(401).json({ message: "Unauthorized" });
   }
 });
-
 // routes/admin.js
 app.get("/stats", async (req, res) => {
   try {
