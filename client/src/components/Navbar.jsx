@@ -17,7 +17,7 @@ export default function Navbar({role}) {
     ],
     admin: [
       { name: "Dashboard", path: "/admin/dashboard" },
-      // { name: "All Issues", path: "/admin/issues" },
+      { name: "All Issues", path: "/admin/issues" },
       { name: "Manage Users", path: "/admin/users" },
     ],
   };
@@ -69,6 +69,8 @@ export default function Navbar({role}) {
               <Link to={`/${role}/profile`}  className="hover:text-blue-400 transition">
                 Profile
               </Link>
+               <Link to={`/help?role=${role}`} className=" hover:text-blue-400 transition">Help</Link>
+              <Link to={`/contact?role=${role}`}className=" hover:text-blue-400 transition">Contact</Link>
               <Link to="/logout" className="text-red-600 font-semibold">
                 Logout
               </Link>
@@ -113,6 +115,9 @@ export default function Navbar({role}) {
           >
             Profile
           </Link>
+          <Link to={`/help?role=${role}`} className="text-gray-800 text-lg hover:text-blue-600">Help</Link>
+         <Link to={`/contact?role=${role}`} className="text-gray-800 text-lg hover:text-blue-600">Contact</Link>
+
           <Link
             to="/logout"
             onClick={() => {

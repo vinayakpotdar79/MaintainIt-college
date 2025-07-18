@@ -28,7 +28,7 @@ const AdminDashboard = () => {
   }, []);
 
   return (
-    <div className="bg-gradient-to-br from-indigo-100 to-blue-100 p-6">
+    <div className="bg-gradient-to-br from-violet-100 to-indigo-100 p-6">
       <h2 className="text-3xl font-bold text-indigo-700 mb-6">📊 Admin Dashboard</h2>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
@@ -42,7 +42,7 @@ const AdminDashboard = () => {
         <h2 className="text-xl font-semibold text-gray-800 mb-4">📝 Recent Issues</h2>
         <div className="bg-white rounded-lg shadow overflow-x-auto">
           <table className="w-full table-auto text-sm">
-            <thead className="bg-indigo-100 text-gray-700">
+            <thead className="bg-gradient-to-br from-indigo-100 to-blue-700 text-gray-800">
               <tr>
                 <th className="p-3 text-left">Device</th>
                 <th className="p-3 text-left">Room</th>

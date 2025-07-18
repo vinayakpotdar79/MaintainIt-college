@@ -40,7 +40,7 @@ const ManageUsers = () => {
   };
 
   return (
-    <div className="p-6">
+    <div className="p-6  bg-gradient-to-br from-violet-100 to-indigo-100">
       <h2 className="text-2xl font-bold mb-4">👥 Manage Users</h2>
 
       {/* Add User Form */}
