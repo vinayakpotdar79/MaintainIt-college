@@ -20,6 +20,7 @@ const Maintainer = () => {
     <>
       <Navbar role="maintainer" /> {/* ✅ Only here */}
         <Outlet />
+        <Footer/>
     </>
   );
 };

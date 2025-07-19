@@ -1,11 +1,24 @@
-import React from 'react';
+import { useEffect } from 'react';
 import Navbar from './Navbar';
-import { useSearchParams } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom'; 
+import axios from 'axios';
 const Help = () => {
-         const [searchParams] = useSearchParams();
+    const navigate = useNavigate();
+    const [searchParams] = useSearchParams();
     const role = searchParams.get('role');
+
+   useEffect(() => {
+    axios.defaults.withCredentials = true;
+    axios.get("http://localhost:3000/auth/check")
+      .then((res) => {
+        console.log(res.data.authenticated);
+      })
+      .catch((err) => {
+        console.error("Not authenticated:", err);
+        navigate("/");  // Redirect to login if unauthorized
+      });
+  }, []);
   return (
-    
     <>
       <Navbar role={role} />
       <div className="min-h-screen bg-gradient-to-br from-purple-100 to-indigo-100 flex items-center justify-center py-12 px-4">

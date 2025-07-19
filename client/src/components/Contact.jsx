@@ -1,12 +1,24 @@
-import React from 'react';
+import { useEffect } from 'react';
 import { Mail, Phone, MapPin } from 'lucide-react';
 import Navbar from './Navbar';
-import { useSearchParams } from 'react-router-dom';
-
+import { useNavigate, useSearchParams } from 'react-router-dom'; 
+import axios from 'axios';
 const Contact = () => {
        const [searchParams] = useSearchParams();
     const role = searchParams.get('role');
-    console.log(role);
+    const navigate = useNavigate();
+
+   useEffect(() => {
+    axios.defaults.withCredentials = true;
+    axios.get("http://localhost:3000/auth/check")
+      .then((res) => {
+        console.log(res.data.authenticated);
+      })
+      .catch((err) => {
+        console.error("Not authenticated:", err);
+        navigate("/");  // Redirect to login if unauthorized
+      });
+  }, []);
     return (
   <>
   <Navbar role={role}/>

@@ -3,6 +3,7 @@ import axios from "axios";
 import {Routes,Link,Outlet,Route } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
 import Navbar from "../Navbar";
+import Footer from "../../Footer";
  const Reporter = () => {
   const navigate = useNavigate();
   const [message, setMessage] = useState("");
@@ -23,6 +24,7 @@ import Navbar from "../Navbar";
     <>
     <Navbar role="reporter"/>
       <Outlet />
+      <Footer/>
   </>);
 };
 
