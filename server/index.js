@@ -325,7 +325,6 @@ app.delete("/users/:id", async (req, res) => {
 });
 
 
-
 // Route to fetch user profile
 app.get("/profile",isAuthenticated ,async (req, res) => {
   const userId = req.user.id
@@ -341,6 +340,13 @@ app.get("/profile",isAuthenticated ,async (req, res) => {
     console.error("Error fetching profile:", err);
     res.status(500).json({ message: "Server error" });
   }
+});
+
+app.get("/auth/check", (req, res) => {
+  if (req.isAuthenticated()) {
+    res.json({ authenticated: true, user: req.user });
+  } else {
+res.status(401).json({ authenticated: "Unauthorized" });  }
 });
 app.post("/logout",(req,res)=>{
  req.logout(function (err) {
